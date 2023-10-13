@@ -1,4 +1,21 @@
 import copy
+import heapq
+
+class State:
+
+    def __init__(self,current_state: list[list[int]] , g: int, h: int
+                                , parent_state, move: tuple) -> None:
+        self.values = current_state
+        self.g = g
+        self.h = h
+        self.parent_state = parent_state
+        self.move = move
+
+    def __gt__(self, other) -> None:
+        return other
+    
+    def __repr__(self) -> str:
+        return f"<< {self.values}, {self.g}, {self.h}, {self.parent_state}, {self.move} >>"
 
 class GameSolution:
     """
@@ -42,11 +59,11 @@ class GameSolution:
 
         return arr
 
+
     def has_capacity(self, tube_des: list) -> int:
         "returns capacity of that tube"
         return self.capacity - len(tube_des) 
             
-
 
     def all_moves(self, current_state):
         """returns all the possible moves with this state"""
@@ -105,7 +122,8 @@ class GameSolution:
             different moves and configurations starting from the current state.
         """
         if self.solution_found:
-            self.moves.pop()
+            if len(self.moves) > 0:
+                self.moves.pop()
             return
 
         if self.ws_game.check_victory(current_state):
@@ -114,7 +132,8 @@ class GameSolution:
 
         all_moves = self.all_moves(current_state)
         if len(all_moves) == 0:
-            self.moves.pop()
+            if len(self.moves) > 0:
+                self.moves.pop()
             return
 
         flag = True
@@ -130,14 +149,39 @@ class GameSolution:
                 self.solve(current_state_copy)
         
         if not self.solution_found:
-            self.moves.pop()
+            if len(self.moves) > 0:
+                self.moves.pop()
+
+
+    def calculate_heuristic(self, current_state: list[list[int]]) -> int:
+        "this function calculate h(n) based on different colors in each tube"
+        
+        h = 0
+    
+        for tube in current_state:
+            for i in range(len(tube) - 1):
+                if tube[i] != tube[i + 1]:
+                    h += 1
+
+        return h
                 
 
+    def initialize_pq(self, current_state, queue):
+        """a function to add initial states in the queue"""
         
+        possible_moves = self.all_moves(current_state)
+        for move in possible_moves:
+            current_state_copy = copy.deepcopy(current_state)
+            self.move_water(move[0], move[1], current_state_copy)
+            hashable_state = self.converted(current_state_copy)
+            if hashable_state not in self.visited_tubes:
+                h = self.calculate_heuristic(current_state_copy)
+                self.visited_tubes.add(hashable_state)
+                new_state = State(current_state_copy, 0, h, None, move)
+                heapq.heappush(queue, (h, new_state))
 
 
-
-
+        
     def optimal_solve(self, current_state):
         """
             Find an optimal solution to the Water Sort game from the current state.
@@ -148,4 +192,43 @@ class GameSolution:
             This method attempts to find an optimal solution to the Water Sort game by minimizing
             the number of moves required to complete the game, starting from the current state.
         """
-        pass
+        
+        won = False
+        priority_queue = []
+        self.initialize_pq(current_state, priority_queue)
+        
+
+        while priority_queue:
+
+            node = heapq.heappop(priority_queue)[1]
+ 
+            if self.ws_game.check_victory(node.values):
+                self.solution_found = True
+                won = True
+                break
+
+            possible_moves = self.all_moves(node.values)
+            for move in possible_moves:
+                current_state_copy = copy.deepcopy(node.values)
+                self.move_water(move[0], move[1], current_state_copy)
+                hashable_state = self.converted(current_state_copy)
+                if hashable_state not in self.visited_tubes:
+                    new_h = self.calculate_heuristic(current_state_copy)
+                    new_g = node.g + 1
+                    self.visited_tubes.add(hashable_state)
+                    new_state = State(current_state_copy, new_g, new_h, node, move)
+                    heapq.heappush(priority_queue, (new_h + new_g, new_state))
+
+
+        # Creating self.moves list
+        if won:
+            print("won")
+            while node.parent_state != None:
+                self.moves.append(node.move)
+                node = node.parent_state
+            self.moves.append(node.move)
+            self.moves.reverse()
+        else:
+            print("fail")
+
+        
