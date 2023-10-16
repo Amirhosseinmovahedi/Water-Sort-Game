@@ -3,7 +3,7 @@ import pygame
 import random
 import copy
 from ai_solution import GameSolution
-from time import sleep
+import time
 
 # Constants for the game window
 WIDTH = 850
@@ -139,6 +139,8 @@ class Game:
         self.tubes = 0
         self.NColorInTube = 2
         self.NEmptyTubes = 1
+        # self.NColorInTube = 5
+        # self.NEmptyTubes = 2
         self.NColor = 3
         self.color_count = self.NColor
         self.empty_tubes_count = self.NEmptyTubes
@@ -189,8 +191,8 @@ class Game:
             check_win = self.check_victory(tubes_colors)
 
         print(tubes_colors, tubes_number)
-        # tubes_colors = [[4, 2], [0, 5], [2, 5], [1, 1], [0, 3], [3, 4], []]
-        # tubes_number = 7
+        # tubes_colors = [[1, 0, 2, 1, 3], [5, 5, 3, 5, 5], [0, 1, 2, 1, 0], [4, 0, 2, 4, 4], [3, 6, 4, 6, 4], [6, 5, 2, 6, 6], [3, 0, 1, 3, 2], [], []]
+        # tubes_number = 9
         return tubes_number, tubes_colors
 
     def draw_tubes(self, tubes_num, tube_cols):
@@ -281,7 +283,7 @@ class Game:
                     tube_cols[dest_tube].append(color_to_move)
                     tube_cols[sel_tube].pop(-1)
 
-        print(f">>> moving: {sel_tube} -> {dest_tube}")
+        # print(f">>> moving: {sel_tube} -> {dest_tube}") # Debug
         return tube_cols
 
     def check_victory(self, tube_cols):
@@ -425,17 +427,20 @@ class Game:
                                             self.empty_tubes_spinner.value)
                         if self.solve_game_button.rect.collidepoint(event.pos):
                             print("solving...")
+                            time
                             solution = GameSolution(self)
                             solution.solve(self.tube_colors)
                             print(solution.solution_found, solution.moves)
                             print("move count:", len(solution.moves))
-                            # input() # Delete me
                             if solution.solution_found:
                                 self.auto_move(solution.moves, move_font)
                         if self.optimal_solve_button.rect.collidepoint(event.pos):
                             print("optimal solving...")
                             solution = GameSolution(self)
+                            start_dm = time.perf_counter()
                             solution.optimal_solve(self.tube_colors)
+                            end_dm = time.perf_counter()
+                            print(f"time -> {end_dm - start_dm}")
                             print(solution.solution_found, solution.moves)
                             print("optimal move count:", len(solution.moves))
                             if solution.solution_found:

@@ -15,6 +15,7 @@ class State:
         return other
     
     def __repr__(self) -> str:
+        """using string representation for dubuging purposes"""
         return f"<< {self.values}, {self.g}, {self.h}, {self.parent_state}, {self.move} >>"
 
 class GameSolution:
@@ -136,15 +137,16 @@ class GameSolution:
                 self.moves.pop()
             return
 
-        flag = True
+        # flag = True
         for move in all_moves:
             current_state_copy = copy.deepcopy(current_state)
             self.move_water(move[0], move[1], current_state_copy)
-            if self.converted(current_state_copy) in self.visited_tubes:
+            hashable_state = self.converted(current_state_copy)
+            if hashable_state in self.visited_tubes:
                 continue
             else:
-                flag = False
-                self.visited_tubes.add(self.converted(current_state_copy))
+                # flag = False
+                self.visited_tubes.add(hashable_state)
                 self.moves.append(move)
                 self.solve(current_state_copy)
         
@@ -222,13 +224,10 @@ class GameSolution:
 
         # Creating self.moves list
         if won:
-            print("won")
             while node.parent_state != None:
                 self.moves.append(node.move)
                 node = node.parent_state
             self.moves.append(node.move)
             self.moves.reverse()
-        else:
-            print("fail")
 
         
