@@ -219,7 +219,7 @@ class GameSolution:
             the number of moves required to complete the game, starting from the current state.
         """
         
-        won = False
+        # won = False
         priority_queue = []
         self.initialize_pq(current_state, priority_queue)
         
@@ -230,7 +230,7 @@ class GameSolution:
  
             if self.ws_game.check_victory(node.values):
                 self.solution_found = True
-                won = True
+                # won = True
                 break
 
             possible_moves = self.all_moves(node.values)
@@ -248,7 +248,8 @@ class GameSolution:
 
 
         # Creating self.moves list
-        if won:
+        # if won:
+        if self.solution_found:
             while node.parent_state != None:
                 self.moves.append(node.move)
                 node = node.parent_state

@@ -139,7 +139,7 @@ class Game:
         self.tubes = 0
         self.NColorInTube = 2
         self.NEmptyTubes = 1
-        # self.NColorInTube = 5
+        # self.NColorInTube = 6
         # self.NEmptyTubes = 2
         self.NColor = 3
         self.color_count = self.NColor
