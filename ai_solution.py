@@ -171,7 +171,23 @@ class GameSolution:
         "this function calculate the heuristic in a optiaml way"
 
         h = former_h
+        
+        for i in range(len(former_state[move[0]]) - 1):
+            if former_state[move[0]][i] != former_state[move[0]][i + 1]:
+                h -= 1
 
+        for i in range(len(former_state[move[1]]) - 1):
+            if former_state[move[1]][i] != former_state[move[1]][i + 1]:
+                h -= 1
+
+        for i in range(len(current_state[move[0]]) - 1):
+            if current_state[move[0]][i] != current_state[move[0]][i + 1]:
+                h += 1
+
+        for i in range(len(current_state[move[1]]) - 1):
+            if current_state[move[1]][i] != current_state[move[1]][i + 1]:
+                h += 1
+        
         return h
 
                 
@@ -224,6 +240,7 @@ class GameSolution:
                 hashable_state = str(current_state_copy)
                 if hashable_state not in self.visited_tubes:
                     new_h = self.calculate_heuristic(current_state_copy)
+                    # new_h = self.calculate_heuristic_optiaml(current_state_copy, node.h, move, node.values)
                     new_g = node.g + 1
                     self.visited_tubes.add(hashable_state)
                     new_state = State(current_state_copy, new_g, new_h, node, move)
