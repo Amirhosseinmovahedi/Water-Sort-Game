@@ -12,7 +12,7 @@ class State:
         self.move = move
 
     def __gt__(self, other) -> None:
-        return other
+        return True
     
     def __repr__(self) -> str:
         """using string representation for dubuging purposes"""
@@ -49,17 +49,6 @@ class GameSolution:
         self.visited_tubes = set()  # A set of visited tubes.
         self.capacity = self.ws_game.NColorInTube
 
-    def converted(self, data: list[list]) -> tuple[tuple]:
-        """convert a list of lists to a hashable type"""
-
-        arr = data.copy()
-        for i in range(len(arr)):
-            arr[i] = tuple(arr[i])
-        
-        arr = tuple(arr)
-
-        return arr
-
 
     def has_capacity(self, tube_des: list) -> int:
         "returns capacity of that tube"
@@ -71,16 +60,29 @@ class GameSolution:
 
         possible_moves = [] # a list of tuples
         for s in range(len(current_state)):
-            if len(current_state[s]) == 0:
+            source = current_state[s]
+            color_num = len(set(source))
+            
+            if len(source) == 0:
+                continue   
+            
+            if len(source) == self.capacity and color_num == 1:
                 continue
+
+            empty_move_flg = False
             for des in range(len(current_state)):
+                destination = current_state[des]
                 if des == s:
                     continue
 
-                if len(current_state[des]) == 0:
-                    possible_moves.append((s, des))
-                
-                elif (current_state[s][-1] == current_state[des][-1]) and (self.has_capacity(current_state[des]) > 0):
+                if color_num == 1 and len(destination) == 0:
+                    continue
+
+                if len(destination) == 0:
+                    if empty_move_flg == False:
+                        empty_move_flg = True
+                        possible_moves.append((s, des))
+                elif (source[-1] == destination[-1]) and (self.capacity - len(destination) > 0):
                     possible_moves.append((s, des))
 
         return possible_moves
@@ -137,15 +139,13 @@ class GameSolution:
                 self.moves.pop()
             return
 
-        # flag = True
         for move in all_moves:
             current_state_copy = copy.deepcopy(current_state)
             self.move_water(move[0], move[1], current_state_copy)
-            hashable_state = self.converted(current_state_copy)
+            hashable_state = str(current_state_copy)
             if hashable_state in self.visited_tubes:
                 continue
             else:
-                # flag = False
                 self.visited_tubes.add(hashable_state)
                 self.moves.append(move)
                 self.solve(current_state_copy)
@@ -157,7 +157,7 @@ class GameSolution:
 
     def calculate_heuristic(self, current_state: list[list[int]]) -> int:
         "this function calculate h(n) based on different colors in each tube"
-        
+    
         h = 0
     
         for tube in current_state:
@@ -166,6 +166,14 @@ class GameSolution:
                     h += 1
 
         return h
+    
+    def calculate_heuristic_optiaml(self, current_state: list[list[int]], former_h: int, move: tuple, former_state: list[list[int]]) -> int:
+        "this function calculate the heuristic in a optiaml way"
+
+        h = former_h
+
+        return h
+
                 
 
     def initialize_pq(self, current_state, queue):
@@ -175,7 +183,7 @@ class GameSolution:
         for move in possible_moves:
             current_state_copy = copy.deepcopy(current_state)
             self.move_water(move[0], move[1], current_state_copy)
-            hashable_state = self.converted(current_state_copy)
+            hashable_state = str(current_state_copy)
             if hashable_state not in self.visited_tubes:
                 h = self.calculate_heuristic(current_state_copy)
                 self.visited_tubes.add(hashable_state)
@@ -213,7 +221,7 @@ class GameSolution:
             for move in possible_moves:
                 current_state_copy = copy.deepcopy(node.values)
                 self.move_water(move[0], move[1], current_state_copy)
-                hashable_state = self.converted(current_state_copy)
+                hashable_state = str(current_state_copy)
                 if hashable_state not in self.visited_tubes:
                     new_h = self.calculate_heuristic(current_state_copy)
                     new_g = node.g + 1

@@ -139,7 +139,7 @@ class Game:
         self.tubes = 0
         self.NColorInTube = 2
         self.NEmptyTubes = 1
-        # self.NColorInTube = 5
+        # self.NColorInTube = 6
         # self.NEmptyTubes = 2
         self.NColor = 3
         self.color_count = self.NColor
@@ -191,6 +191,8 @@ class Game:
             check_win = self.check_victory(tubes_colors)
 
         print(tubes_colors, tubes_number)
+        # tubes_colors = [[4, 0, 1, 0, 3, 5], [5, 3, 1, 1, 4, 1], [5, 2, 4, 1, 0, 2], [0, 3, 5, 3, 0, 3], [2, 5, 4, 4, 5, 1], [2, 0, 4, 2, 3, 2], [], []]
+        # tubes_number = 8
         # tubes_colors = [[1, 0, 2, 1, 3], [5, 5, 3, 5, 5], [0, 1, 2, 1, 0], [4, 0, 2, 4, 4], [3, 6, 4, 6, 4], [6, 5, 2, 6, 6], [3, 0, 1, 3, 2], [], []]
         # tubes_number = 9
         return tubes_number, tubes_colors
@@ -353,7 +355,7 @@ class Game:
             self.screen.blit(self.move_text, (10, 10))
             self.draw_tubes(self.tubes, self.tube_colors)
             pygame.display.flip()
-            pygame.time.delay(500)  # Add a delay to slow down the automatic moves for better visualization
+            pygame.time.delay(0)  # Add a delay to slow down the automatic moves for better visualization
 
     def run_game(self):
         """Run the main game loop."""
