@@ -355,7 +355,7 @@ class Game:
             self.screen.blit(self.move_text, (10, 10))
             self.draw_tubes(self.tubes, self.tube_colors)
             pygame.display.flip()
-            pygame.time.delay(0)  # Add a delay to slow down the automatic moves for better visualization
+            pygame.time.delay(250)  # Add a delay to slow down the automatic moves for better visualization
 
     def run_game(self):
         """Run the main game loop."""
