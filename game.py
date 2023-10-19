@@ -139,8 +139,6 @@ class Game:
         self.tubes = 0
         self.NColorInTube = 2
         self.NEmptyTubes = 1
-        # self.NColorInTube = 6
-        # self.NEmptyTubes = 2
         self.NColor = 3
         self.color_count = self.NColor
         self.empty_tubes_count = self.NEmptyTubes
@@ -190,11 +188,12 @@ class Game:
                     available_colors.remove(color)
             check_win = self.check_victory(tubes_colors)
 
-        print(tubes_colors, tubes_number)
+        # print(tubes_colors, tubes_number)
         # tubes_colors = [[4, 0, 1, 0, 3, 5], [5, 3, 1, 1, 4, 1], [5, 2, 4, 1, 0, 2], [0, 3, 5, 3, 0, 3], [2, 5, 4, 4, 5, 1], [2, 0, 4, 2, 3, 2], [], []]
         # tubes_number = 8
-        # tubes_colors = [[1, 0, 2, 1, 3], [5, 5, 3, 5, 5], [0, 1, 2, 1, 0], [4, 0, 2, 4, 4], [3, 6, 4, 6, 4], [6, 5, 2, 6, 6], [3, 0, 1, 3, 2], [], []]
-        # tubes_number = 9
+        # self.NColorInTube = 6
+        # self.NEmptyTubes = 2
+        # self.NColor = 6
         return tubes_number, tubes_colors
 
     def draw_tubes(self, tubes_num, tube_cols):
@@ -285,7 +284,6 @@ class Game:
                     tube_cols[dest_tube].append(color_to_move)
                     tube_cols[sel_tube].pop(-1)
 
-        # print(f">>> moving: {sel_tube} -> {dest_tube}") # Debug
         return tube_cols
 
     def check_victory(self, tube_cols):
@@ -301,11 +299,13 @@ class Game:
             if len(tube_cols[i]) > 0:
                 if len(tube_cols[i]) != self.NColorInTube:
                     won = False
+                    return won
                 else:
                     main_color = tube_cols[i][-1]
                     for j in range(len(tube_cols[i])):
                         if tube_cols[i][j] != main_color:
                             won = False
+                            return won
         return won
 
     def reset_game(self, colors_count, color_tube_count, empty_tubes):
@@ -355,7 +355,7 @@ class Game:
             self.screen.blit(self.move_text, (10, 10))
             self.draw_tubes(self.tubes, self.tube_colors)
             pygame.display.flip()
-            pygame.time.delay(100)  # Add a delay to slow down the automatic moves for better visualization
+            pygame.time.delay(0)  # Add a delay to slow down the automatic moves for better visualization
 
     def run_game(self):
         """Run the main game loop."""
@@ -428,22 +428,25 @@ class Game:
                             self.reset_game(self.color_spinner.value, self.colors_in_tube_spinner.value,
                                             self.empty_tubes_spinner.value)
                         if self.solve_game_button.rect.collidepoint(event.pos):
+                            print("-------")
                             print("solving...")
                             time
                             solution = GameSolution(self)
+                            start_dm = time.perf_counter()
                             solution.solve(self.tube_colors)
-                            print(solution.solution_found, solution.moves)
+                            end_dm = time.perf_counter()
+                            print(f"time -> {end_dm - start_dm}")
                             print("move count:", len(solution.moves))
                             if solution.solution_found:
                                 self.auto_move(solution.moves, move_font)
                         if self.optimal_solve_button.rect.collidepoint(event.pos):
+                            print("-------")
                             print("optimal solving...")
                             solution = GameSolution(self)
                             start_dm = time.perf_counter()
                             solution.optimal_solve(self.tube_colors)
                             end_dm = time.perf_counter()
                             print(f"time -> {end_dm - start_dm}")
-                            print(solution.solution_found, solution.moves)
                             print("optimal move count:", len(solution.moves))
                             if solution.solution_found:
                                 self.auto_move(solution.moves, move_font)
